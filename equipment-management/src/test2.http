@@ -1,0 +1,13 @@
+### 없는 장비 조회
+GET http://localhost:8080/equipments/999
+
+###
+POST http://localhost:8080/equipments
+Content-Type: application/json
+
+{
+  "name": "",
+  "type": "",
+  "status": "",
+  "location": ""
+}

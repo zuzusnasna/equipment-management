@@ -1,0 +1,27 @@
+### 장비 전체 조회
+GET http://localhost:8080/equipments
+
+### 장비 등록
+POST http://localhost:8080/equipments
+Content-Type: application/json
+
+{
+  "name": "Die Bonder",
+  "type": "Bonder",
+  "status": "정상",
+  "location": "2공장"
+}
+### 장비 수정
+PUT http://localhost:8080/equipments/2
+Content-Type: application/json
+
+{
+  "name": "Die Bonder",
+  "type": "Bonder",
+  "status": "점검중",
+  "location": "2공장"
+}
+### 장비 삭제
+DELETE http://localhost:8080/equipments/2
+### 전체 조회
+GET http://localhost:8080/equipments

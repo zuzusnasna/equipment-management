@@ -1,0 +1,37 @@
+# =========================
+# Java / Spring Boot
+# =========================
+
+**/target/
+*.class
+
+# IntelliJ
+**/.idea/
+*.iml
+*.iws
+*.ipr
+
+# Logs
+*.log
+
+# =========================
+# React / Node
+# =========================
+
+**/node_modules/
+**/dist/
+**/build/
+
+# Environment
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+
+# =========================
+# OS
+# =========================
+
+.DS_Store
+Thumbs.db
