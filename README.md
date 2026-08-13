@@ -34,8 +34,18 @@ REST API 설계부터 데이터베이스 연동,
 | IDE | IntelliJ IDEA |
 | Version Control | Git / GitHub |
 
----
 
+---
+| Method | URL                               | 설명       |
+| ------ | --------------------------------- | -------- |
+| GET    | `/equipments`                     | 전체 장비 조회 |
+| GET    | `/equipments/{id}`                | 장비 단건 조회 |
+| POST   | `/equipments`                     | 장비 등록    |
+| PUT    | `/equipments/{id}`                | 장비 수정    |
+| DELETE | `/equipments/{id}`                | 장비 삭제    |
+| GET    | `/equipments/search?status=정상`    | 상태 검색    |
+| GET    | `/equipments/search/name?name=TC` | 이름 검색    |
+```text
 ## 📂 프로젝트 구조
 
 ```text
