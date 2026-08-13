@@ -1,0 +1,14 @@
+### 장비 등록
+POST http://localhost:8080/equipment
+Content-Type: application/json
+
+{
+  "name": "TC Bonder",
+  "type": "Bonder",
+  "status": "정상",
+  "location": "1공장"
+}
+
+### 장비 전체 조회
+GET http://localhost:8080/equipment
+

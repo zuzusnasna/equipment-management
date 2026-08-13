@@ -1,0 +1,5 @@
+### 정상 장비 검색
+GET http://localhost:8080/equipments/search?status=정상
+
+### 이름으로 장비 검색
+GET http://localhost:8080/equipments/search/name?name=TC

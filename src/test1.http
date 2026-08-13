@@ -1,0 +1,19 @@
+### 전체 장비 조회
+GET http://localhost:8080/equipments
+
+### 장비 1개 조회
+GET http://localhost:8080/equipments/1
+
+### 장비 등록
+POST http://localhost:8080/equipments
+Content-Type: application/json
+
+### 장비 수정
+PUT http://localhost:8080/equipments/3
+Content-Type: application/json
+
+### 장비 삭제
+DELETE http://localhost:8080/equipments/3
+
+### 전체 장비 조회
+GET http://localhost:8080/equipments
