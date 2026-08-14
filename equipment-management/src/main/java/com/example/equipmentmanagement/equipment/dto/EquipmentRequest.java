@@ -1,17 +1,21 @@
 package com.example.equipmentmanagement.equipment.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class EquipmentRequest {
+
+    @NotBlank(message = "장비 번호는 필수입니다.")
+    private String eqNo;
 
     @NotBlank(message = "장비 이름은 필수입니다.")
     private String name;
 
-    @NotBlank(message = "장비 종류는 필수입니다.")
-    private String type;
+    @NotNull(message = "장비 카테고리는 필수입니다.")
+    private Long categoryId;
 
-    @NotBlank(message = "장비 상태는 필수입니다.")
-    private String status;
+    @NotNull(message = "장비 상태는 필수입니다.")
+    private Long statusCodeId;
 
     @NotBlank(message = "장비 위치는 필수입니다.")
     private String location;
@@ -19,31 +23,40 @@ public class EquipmentRequest {
     public EquipmentRequest() {
     }
 
+    public String getEqNo() {
+        return eqNo;
+    }
+
     public String getName() {
         return name;
     }
 
-    public String getType() {
-        return type;
+    public Long getCategoryId() {
+        return categoryId;
     }
 
-    public String getStatus() {
-        return status;
+    public Long getStatusCodeId() {
+        return statusCodeId;
     }
 
     public String getLocation() {
         return location;
     }
+
+    public void setEqNo(String eqNo) {
+        this.eqNo = eqNo;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setStatusCodeId(Long statusCodeId) {
+        this.statusCodeId = statusCodeId;
     }
 
     public void setLocation(String location) {

@@ -3,9 +3,9 @@
 -- ========================================
 
 
--- ----------------------------------------
+-- ========================================
 -- 1. 장비 목록
--- ----------------------------------------
+-- ========================================
 
 SELECT
     e.equipment_id,
@@ -24,9 +24,9 @@ FROM EQUIPMENT e
 ORDER BY e.equipment_id;
 
 
--- ----------------------------------------
+-- ========================================
 -- 2. 특정 장비 조회
--- ----------------------------------------
+-- ========================================
 
 SELECT
     e.equipment_id,
@@ -43,9 +43,9 @@ FROM EQUIPMENT e
 WHERE e.equipment_id = 1;
 
 
--- ----------------------------------------
+-- ========================================
 -- 3. 장애 조치 결과 조회
--- ----------------------------------------
+-- ========================================
 
 SELECT
     fa.action_id,
@@ -69,9 +69,9 @@ WHERE fa.action_id = (
 );
 
 
--- ----------------------------------------
+-- ========================================
 -- 4. 장애 상세 조회
--- ----------------------------------------
+-- ========================================
 
 SELECT
     f.failure_id,
@@ -87,20 +87,20 @@ SELECT
 FROM FAILURE f
          JOIN EQUIPMENT e
               ON f.equipment_id = e.equipment_id
-         JOIN ASSIGNMENT a
-              ON f.failure_id = a.failure_id
-         JOIN USERS eng
-              ON a.engineer_id = eng.user_id
-         JOIN FAILURE_ACTION fa
-              ON a.assign_id = fa.assign_id
+         LEFT JOIN ASSIGNMENT a
+                   ON f.failure_id = a.failure_id
+         LEFT JOIN USERS eng
+                   ON a.engineer_id = eng.user_id
+         LEFT JOIN FAILURE_ACTION fa
+                   ON a.assign_id = fa.assign_id
          JOIN COMMON_CODE cc
               ON f.status_code_id = cc.code_id
 WHERE f.failure_id = 1;
 
 
--- ----------------------------------------
+-- ========================================
 -- 5. 현재 장애 상태 조회
--- ----------------------------------------
+-- ========================================
 
 SELECT
     f.failure_id,
@@ -115,9 +115,9 @@ FROM FAILURE f
 WHERE f.failure_id = 1;
 
 
--- ----------------------------------------
+-- ========================================
 -- 6. 장애 상태 변경 이력
--- ----------------------------------------
+-- ========================================
 
 SELECT
     sh.history_id,
@@ -136,14 +136,16 @@ WHERE sh.failure_id = 1
 ORDER BY sh.history_id;
 
 
--- ----------------------------------------
+-- ========================================
 -- 7. 담당 엔지니어 장비 조회
--- ----------------------------------------
+-- ========================================
 
 SELECT
     em.manager_id,
+    e.equipment_id,
     e.eq_no,
     e.name AS equipment_name,
+    u.user_id AS engineer_id,
     u.name AS engineer,
     em.assigned_at,
     em.ended_at,
@@ -153,16 +155,18 @@ FROM EQUIPMENT_MANAGER em
               ON em.equipment_id = e.equipment_id
          JOIN USERS u
               ON em.engineer_id = u.user_id
-WHERE em.use_yn = 'Y';
+WHERE em.use_yn = 'Y'
+ORDER BY e.equipment_id;
 
 
--- ----------------------------------------
+-- ========================================
 -- 8. 장애 검토 결과 조회
--- ----------------------------------------
+-- ========================================
 
 SELECT
     fr.review_id,
     fr.failure_id,
+    u.user_id AS reviewer_id,
     u.name AS reviewer,
     fr.review_result,
     fr.review_comment,
@@ -173,12 +177,13 @@ FROM FAILURE_REVIEW fr
 ORDER BY fr.reviewed_at DESC;
 
 
--- ----------------------------------------
+-- ========================================
 -- 9. 감사 로그 조회
--- ----------------------------------------
+-- ========================================
 
 SELECT
     al.audit_id,
+    u.user_id,
     u.name AS user_name,
     al.action_type,
     al.table_name,

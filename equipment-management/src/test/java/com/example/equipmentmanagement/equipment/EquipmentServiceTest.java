@@ -25,10 +25,15 @@ class EquipmentServiceTest {
 
         Equipment equipment =
                 new Equipment(
-                        "TC Bonder",
-                        "Bonder",
-                        "정상",
-                        "1공장"
+                        1L,              // companyId
+                        1L,              // categoryId
+                        "EQ-001",        // eqNo
+                        "TC Bonder",     // name
+                        "Bonder",        // type
+                        "정상",          // status
+                        "1공장",         // location
+                        1L,              // statusCodeId
+                        "Y"              // useYn
                 );
 
         when(equipmentRepository.findById(1L))
@@ -36,6 +41,8 @@ class EquipmentServiceTest {
 
         Equipment result =
                 equipmentService.getEquipment(1L);
+
+        assertNotNull(result);
 
         assertEquals("TC Bonder", result.getName());
         assertEquals("Bonder", result.getType());
@@ -55,5 +62,7 @@ class EquipmentServiceTest {
                 EquipmentNotFoundException.class,
                 () -> equipmentService.getEquipment(999L)
         );
+
+        verify(equipmentRepository).findById(999L);
     }
 }
