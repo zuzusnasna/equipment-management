@@ -4,7 +4,7 @@ import "./index.css";
 import App from "./App.jsx";
 import LoginPage from "./LoginPage.jsx";
 
-function Root() {
+export function Root() {
     const [user, setUser] = useState(null);
 
     const handleLogin = (userData) => {
