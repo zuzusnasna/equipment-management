@@ -1,171 +1,137 @@
-# 🏭 Equipment Management System
+# 🖥️ 장비 관리 시스템
 
-Spring Boot와 React를 기반으로 구현한 **장비 관리 시스템**입니다.
+Spring Boot와 React를 기반으로 제작한 장비 관리 시스템입니다.
 
-제조 현장에서 사용하는 장비 정보를 등록하고 조회·수정·삭제할 수 있으며,
-장비 상태와 장비명·유형·위치를 기준으로 검색 및 필터링할 수 있도록 구현했습니다.
-
-또한 공장별 장비 현황과 상태별 장비 수를 한눈에 확인할 수 있도록
-대시보드 형태의 UI를 구현했습니다.
+장비의 등록, 조회, 수정, 삭제부터 장비 상태 및 공장별 현황 조회,
+검색 및 필터링 기능을 제공하며 로그인 인증을 통해 사용자별 시스템 접근을 관리합니다.
 
 ---
 
 ## 📌 프로젝트 소개
 
-제조 현장에서 관리되는 장비 정보를 효율적으로 관리하는 것을 목표로
-장비 관리 시스템을 구현했습니다.
+현장에서 관리되는 장비 정보를 효율적으로 관리하기 위한 웹 기반 장비 관리 시스템입니다.
 
-단순한 CRUD 기능 구현에 그치지 않고,
+기존의 장비 정보를 단순히 조회하는 것에서 그치지 않고,
+장비 상태와 공장별 현황을 한눈에 확인할 수 있도록 대시보드 형태로 구성했습니다.
 
-- REST API 설계
-- 데이터베이스 연동
-- 입력값 검증
-- 예외 처리
-- 검색 및 필터링
+또한 장비 등록/수정/삭제 기능과 검색 및 필터 기능을 구현하여
+장비 관리 업무를 편리하게 수행할 수 있도록 제작했습니다.
+
+---
+
+## 🛠️ 기술 스택
+
+### Backend
+
+- Java 21
+- Spring Boot
+- Spring Security
+- JPA
+- Oracle Database
+- Maven
+
+### Frontend
+
+- React
+- JavaScript
+- HTML
+- CSS
+- Fetch API
+
+### 개발 도구
+
+- IntelliJ IDEA
+- VS Code
+- Git / GitHub
+- Postman
+
+---
+
+## ✨ 주요 기능
+
+### 🔐 로그인 / 인증
+
+- 사용자 로그인
+- Spring Security 기반 인증
+- 세션 / 쿠키 기반 로그인 상태 관리
+- 로그인 사용자 정보 확인
+- 로그아웃
+
+### 🖥️ 장비 관리
+
+- 장비 전체 조회
+- 장비 상세 조회
+- 장비 등록
+- 장비 수정
+- 장비 삭제
+- 장비 번호 중복 확인
+
+### 🔎 검색 / 필터
+
+- 장비 번호 검색
+- 장비명 검색
+- 위치 검색
+- 상태별 필터
+- 공장별 필터
+- 검색 조건 초기화
+
+### 📊 대시보드
+
+- 전체 장비 수
+- 정상 장비 수
+- 오류 장비 수
+- 중지 장비 수
 - 공장별 장비 현황
-- 대시보드
-- 반응형 UI
-- API 테스트
-- Swagger API 문서화
 
-등 실제 웹 서비스 개발 과정에서 사용되는 기능들을 직접 구현하는 데
-중점을 두었습니다.
+### 🏭 공장별 현황
 
----
+공장별로 등록된 장비 수를 확인할 수 있으며,
+공장을 선택하면 해당 공장의 장비만 조회할 수 있습니다.
 
-## 🎯 프로젝트 목표
+### 📋 장비 상세 정보
 
-1. Spring Boot 기반 REST API 설계 및 구현
-2. JPA를 이용한 Oracle Database 연동
-3. 장비 CRUD 기능 구현
-4. 장비 검색 및 상태 필터 기능 구현
-5. 공장별 장비 현황 조회 기능 구현
-6. React 기반 프론트엔드 구현
-7. 백엔드 API와 프론트엔드 연동
-8. 예외 처리 및 입력값 검증
-9. JUnit과 Mockito를 이용한 테스트
-10. Swagger를 이용한 API 문서화
-11. 반응형 UI 구현
-
----
-
-# 🛠 기술 스택
-
-## Backend
-
-| 구분 | 기술 |
-|---|---|
-| Language | Java 26 |
-| Framework | Spring Boot 4.1.0 |
-| ORM | Spring Data JPA |
-| Database | Oracle Database |
-| Build Tool | Maven |
-| API | REST API |
-| Validation | Jakarta Validation |
-| Documentation | Swagger / OpenAPI |
-| Test | JUnit 6, Mockito |
-| IDE | IntelliJ IDEA |
-
-## Frontend
-
-| 구분 | 기술 |
-|---|---|
-| Language | JavaScript |
-| Framework | React |
-| Build Tool | Vite |
-| HTTP 통신 | Fetch API |
-| Styling | CSS |
-| IDE | IntelliJ IDEA / VS Code |
-
-## DevOps / Version Control
-
-| 구분 | 기술 |
-|---|---|
-| Version Control | Git |
-| Repository | GitHub |
-
----
-
-# ✨ 주요 기능
-
-## 1. 장비 CRUD
-
-장비 정보를 등록하고 조회·수정·삭제할 수 있습니다.
-
-### 장비 정보
+장비명을 클릭하면 상세 모달을 통해 다음 정보를 확인할 수 있습니다.
 
 - 장비 ID
+- 장비 번호
 - 장비명
-- 장비 유형
+- 카테고리
 - 상태
 - 위치
 
-### 지원 기능
+---
 
-- 장비 등록
-- 전체 장비 조회
-- 장비 단건 조회
-- 장비 수정
-- 장비 삭제
+## 🗂️ 장비 데이터 구조
+
+장비는 다음 정보를 기준으로 관리합니다.
+
+| 항목 | 설명 |
+|---|---|
+| ID | 장비 식별자 |
+| 장비 번호 | 장비 고유 번호 |
+| 장비명 | 장비 이름 |
+| 카테고리 | 생산장비 / 가공장비 / 검사장비 |
+| 상태 | 정상 / 오류 / 중지 |
+| 위치 | 장비가 위치한 공장 또는 장소 |
 
 ---
 
-## 2. 장비 검색
-
-장비명, 장비 유형, 위치를 기준으로 장비를 검색할 수 있습니다.
-
-예를 들어,
+## 🔄 장비 관리 프로세스
 
 ```text
-Bonder
-
-<프로젝트 구조>
-equipment-management
-│
-├── backend
-│   │
-│   ├── src
-│   │   ├── main
-│   │   │   ├── java
-│   │   │   │   └── com.example.equipmentmanagement
-│   │   │   │       │
-│   │   │   │       ├── EquipmentManagementApplication.java
-│   │   │   │       │
-│   │   │   │       └── equipment
-│   │   │   │           ├── Equipment.java
-│   │   │   │           ├── EquipmentController.java
-│   │   │   │           ├── EquipmentRepository.java
-│   │   │   │           ├── EquipmentService.java
-│   │   │   │           ├── EquipmentNotFoundException.java
-│   │   │   │           ├── GlobalExceptionHandler.java
-│   │   │   │           │
-│   │   │   │           └── dto
-│   │   │   │               ├── EquipmentRequest.java
-│   │   │   │               └── EquipmentResponse.java
-│   │   │   │
-│   │   │   └── resources
-│   │   │       └── application.properties
-│   │   │
-│   │   └── test
-│   │       └── java
-│   │           └── com.example.equipmentmanagement
-│   │               └── equipment
-│   │                   ├── EquipmentControllerTest.java
-│   │                   └── EquipmentServiceTest.java
-│   │
-│   └── pom.xml
-│
-├── frontend
-│   │
-│   ├── src
-│   │   ├── api
-│   │   │   └── equipmentApi.js
-│   │   │
-│   │   ├── App.jsx
-│   │   ├── App.css
-│   │   └── main.jsx
-│   │
-│   ├── package.json
-│   └── vite.config.js
-│
-└── README.md
+로그인
+  ↓
+장비 관리 시스템
+  ↓
+장비 현황 확인
+  ↓
+┌───────────────┐
+│ 장비 등록      │
+│ 장비 조회      │
+│ 장비 수정      │
+│ 장비 삭제      │
+└───────────────┘
+  ↓
+검색 / 필터
+  ↓
+장비 상세 확인
