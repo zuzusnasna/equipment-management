@@ -19,155 +19,72 @@ function LoginPage({ onLogin }) {
             setLoading(true);
             setError("");
 
-            const response = await fetch(
-                "http://localhost:8080/login",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    credentials: "include",
-                    body: JSON.stringify({
-                        loginId: loginId.trim(),
-                        password,
-                    }),
-                }
-            );
+            const response = await fetch("http://localhost:8080/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    loginId: loginId.trim(),
+                    password,
+                }),
+            });
 
-            // 백엔드 로그인 응답이 JSON인지 확인한 뒤
-            // JSON이면 객체로 변환하고, 문자열이면 그대로 사용합니다.
             const contentType = response.headers.get("content-type") || "";
-            const responseText = await response.text();
-
-            let data = null;
+            let data;
 
             if (contentType.includes("application/json")) {
-                try {
-                    data = JSON.parse(responseText);
-                } catch (parseError) {
-                    console.error("로그인 응답 JSON 파싱 오류:", parseError);
-                    throw new Error("서버 응답 형식이 올바르지 않습니다.");
-                }
+                data = await response.json();
             } else {
-                data = responseText;
+                data = await response.text();
             }
 
             if (!response.ok) {
-                // 백엔드가 "아이디 또는 비밀번호..." 같은 문자열을 반환하더라도
-                // response.json()을 다시 호출하지 않고 해당 메시지를 사용합니다.
-                throw new Error(
-                    typeof data === "string" && data.trim()
+                const message =
+                    typeof data === "string"
                         ? data
-                        : data?.message ||
-                          "아이디 또는 비밀번호가 올바르지 않습니다."
-                );
+                        : data?.message || "아이디 또는 비밀번호가 올바르지 않습니다.";
+
+                throw new Error(message);
             }
 
             onLogin(data);
-
         } catch (error) {
             console.error("로그인 오류:", error);
-
-            setError(
-                error.message ||
-                "로그인에 실패했습니다."
-            );
-
+            setError(error.message || "로그인에 실패했습니다.");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="login-page">
+        <div className="login-container">
+            <form className="login-form" onSubmit={handleSubmit}>
+                <h1>Equipment Management</h1>
 
-            <div className="login-card">
+                <input
+                    type="text"
+                    placeholder="아이디"
+                    value={loginId}
+                    onChange={(e) => setLoginId(e.target.value)}
+                    disabled={loading}
+                />
 
-                <div className="login-header">
+                <input
+                    type="password"
+                    placeholder="비밀번호"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
+                />
 
-                    <div className="login-icon">
-                        ⚙
-                    </div>
+                {error && <p className="login-error">{error}</p>}
 
-                    <h1>
-                        장비 관리 시스템
-                    </h1>
-
-                    <p>
-                        Equipment Management System
-                    </p>
-
-                </div>
-
-                <form
-                    className="login-form"
-                    onSubmit={handleSubmit}
-                >
-
-                    <div className="login-form-group">
-
-                        <label htmlFor="loginId">
-                            아이디
-                        </label>
-
-                        <input
-                            id="loginId"
-                            type="text"
-                            value={loginId}
-                            onChange={(e) =>
-                                setLoginId(e.target.value)
-                            }
-                            placeholder="아이디를 입력하세요"
-                            autoComplete="username"
-                            disabled={loading}
-                        />
-
-                    </div>
-
-                    <div className="login-form-group">
-
-                        <label htmlFor="password">
-                            비밀번호
-                        </label>
-
-                        <input
-                            id="password"
-                            type="password"
-                            value={password}
-                            onChange={(e) =>
-                                setPassword(e.target.value)
-                            }
-                            placeholder="비밀번호를 입력하세요"
-                            autoComplete="current-password"
-                            disabled={loading}
-                        />
-
-                    </div>
-
-                    {error && (
-                        <div className="login-error">
-                            {error}
-                        </div>
-                    )}
-
-                    <button
-                        type="submit"
-                        className="login-button"
-                        disabled={loading}
-                    >
-                        {loading
-                            ? "로그인 중..."
-                            : "로그인"}
-                    </button>
-
-                </form>
-
-                <div className="login-footer">
-                    Equipment Management System
-                </div>
-
-            </div>
-
+                <button type="submit" disabled={loading}>
+                    {loading ? "로그인 중..." : "로그인"}
+                </button>
+            </form>
         </div>
     );
 }
