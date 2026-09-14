@@ -162,6 +162,10 @@ function App({ user, onLogout }) {
     }
   };
 
+  const statusChanged =
+    editingId !== null &&
+    Number(form.statusCodeId) !== Number(editingOriginalStatusId);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -188,9 +192,8 @@ function App({ user, onLogout }) {
       }
     }
 
-    // 장비 수정 시에는 변경 사유를 항상 입력하도록 합니다.
-    if (editingId !== null && !form.comment.trim()) {
-      alert("장비를 수정하려면 변경 사유를 입력해주세요.");
+    if (statusChanged && !form.comment.trim()) {
+      alert("장비 상태를 변경하려면 변경 사유를 입력해주세요.");
       return;
     }
 
@@ -202,7 +205,7 @@ function App({ user, onLogout }) {
       location: form.location.trim(),
     };
 
-    // 변경 사유는 수정 요청에만 전달합니다.
+    // 상태 변경 사유는 수정 요청에만 전달합니다.
     if (editingId !== null) {
       requestData.comment = form.comment.trim();
     }
@@ -460,18 +463,20 @@ function App({ user, onLogout }) {
             {editingId !== null && (
               <div className="form-group" style={{ gridColumn: "1 / -1" }}>
                 <label>
-                  변경 사유 <span style={{ color: "red" }}>*</span>
+                  변경 사유 {statusChanged && <span style={{ color: "red" }}>*</span>}
                 </label>
                 <textarea
                   name="comment"
                   value={form.comment}
                   onChange={handleChange}
-                  placeholder="장비 수정 사유를 입력하세요."
+                  placeholder={statusChanged ? "상태를 변경한 사유를 입력하세요." : "상태 변경 시에만 입력하면 됩니다."}
                   rows="3"
                 />
-                <p style={{ marginTop: "6px", color: "#666", fontSize: "13px" }}>
-                  장비 수정 시 변경 사유가 필수입니다.
-                </p>
+                {statusChanged && (
+                  <p style={{ marginTop: "6px", color: "#666", fontSize: "13px" }}>
+                    상태가 변경되므로 변경 사유가 필수입니다.
+                  </p>
+                )}
               </div>
             )}
           </div>
@@ -516,20 +521,36 @@ function App({ user, onLogout }) {
               <option value="2">오류</option>
               <option value="3">중지</option>
             </select>
+            <button type="button" className="reset-button" onClick={() => { setSearchKeyword(""); setSelectedStatus(""); setSelectedFactory(""); }}>
+              초기화
+            </button>
           </div>
+
+          {(searchKeyword || selectedStatus || selectedFactory) && (
+            <div className="active-filters">
+              <span>현재 필터:</span>
+              {searchKeyword && <span className="filter-badge">검색: {searchKeyword}</span>}
+              {selectedStatus && <span className="filter-badge">상태: {getStatusName(selectedStatus)}</span>}
+              {selectedFactory && <span className="filter-badge">공장: {selectedFactory}</span>}
+            </div>
+          )}
         </div>
 
-        {loading ? (
-          <div className="empty-card">장비 정보를 불러오는 중입니다...</div>
-        ) : error ? (
-          <div className="error-card">{error}</div>
-        ) : filteredEquipments.length === 0 ? (
-          <div className="empty-card">검색 조건에 맞는 장비가 없습니다.</div>
-        ) : (
-          <div className="equipment-table-wrapper">
-            <table className="equipment-table">
+        {loading && <div className="empty-card">장비 목록을 불러오는 중입니다...</div>}
+        {error && <div className="error-card">{error}</div>}
+
+        {!loading && !error && filteredEquipments.length === 0 && (
+          <div className="empty-card">
+            {equipments.length === 0 ? "등록된 장비가 없습니다." : "검색 조건에 맞는 장비가 없습니다."}
+          </div>
+        )}
+
+        {!loading && !error && filteredEquipments.length > 0 && (
+          <div className="table-wrapper">
+            <table>
               <thead>
                 <tr>
+                  <th>ID</th>
                   <th>장비 번호</th>
                   <th>장비명</th>
                   <th>카테고리</th>
@@ -541,15 +562,21 @@ function App({ user, onLogout }) {
               <tbody>
                 {filteredEquipments.map((equipment) => (
                   <tr key={equipment.id}>
+                    <td>{equipment.id}</td>
                     <td>{equipment.eqNo}</td>
-                    <td>{equipment.name}</td>
+                    <td className="equipment-name">
+                      <button type="button" className="equipment-name-button" onClick={() => setSelectedEquipment(equipment)}>
+                        {equipment.name}
+                      </button>
+                    </td>
                     <td><CategoryName categoryId={equipment.categoryId} /></td>
                     <td><StatusBadge status={getStatusName(equipment.statusCodeId)} /></td>
                     <td>{equipment.location}</td>
                     <td>
-                      <button type="button" className="table-button" onClick={() => handleEdit(equipment)}>수정</button>
-                      <button type="button" className="table-button danger" onClick={() => handleDelete(equipment.id)}>삭제</button>
-                      <button type="button" className="table-button" onClick={() => setSelectedEquipment(equipment)}>상세</button>
+                      <div className="table-actions">
+                        <button type="button" className="edit-button" onClick={() => handleEdit(equipment)}>수정</button>
+                        <button type="button" className="delete-button" onClick={() => handleDelete(equipment.id)}>삭제</button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -557,29 +584,56 @@ function App({ user, onLogout }) {
             </table>
           </div>
         )}
+
+        {!loading && !error && equipments.length > 0 && (
+          <div className="table-footer">총 <strong>{filteredEquipments.length}</strong>개 표시</div>
+        )}
       </section>
 
       {selectedEquipment && (
-        <div className="modal-backdrop" onClick={() => setSelectedEquipment(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-overlay" onClick={() => setSelectedEquipment(null)}>
+          <div className="equipment-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <div>
-                <h2>{selectedEquipment.name}</h2>
-                <p>{selectedEquipment.eqNo}</p>
+                <span className="modal-label">EQUIPMENT DETAIL</span>
+                <h2>장비 상세 정보</h2>
               </div>
               <button type="button" className="modal-close" onClick={() => setSelectedEquipment(null)}>×</button>
             </div>
 
-            <div className="modal-body">
-              <div className="detail-grid">
-                <div><strong>장비 번호</strong><span>{selectedEquipment.eqNo}</span></div>
-                <div><strong>장비명</strong><span>{selectedEquipment.name}</span></div>
-                <div><strong>카테고리</strong><span><CategoryName categoryId={selectedEquipment.categoryId} /></span></div>
-                <div><strong>상태</strong><span><StatusBadge status={getStatusName(selectedEquipment.statusCodeId)} /></span></div>
-                <div><strong>위치</strong><span>{selectedEquipment.location}</span></div>
+            <div className="modal-equipment-title">
+              <div className="modal-equipment-icon">⚙️</div>
+              <div>
+                <h3>{selectedEquipment.name}</h3>
+                <p>{selectedEquipment.eqNo}</p>
               </div>
+            </div>
 
-              <EquipmentHistory equipmentId={selectedEquipment.id} />
+            <div className="detail-list">
+              <div className="detail-row"><span>ID</span><strong>{selectedEquipment.id}</strong></div>
+              <div className="detail-row"><span>장비 번호</span><strong>{selectedEquipment.eqNo}</strong></div>
+              <div className="detail-row"><span>장비명</span><strong>{selectedEquipment.name}</strong></div>
+              <div className="detail-row"><span>카테고리</span><strong><CategoryName categoryId={selectedEquipment.categoryId} /></strong></div>
+              <div className="detail-row"><span>상태</span><StatusBadge status={getStatusName(selectedEquipment.statusCodeId)} /></div>
+              <div className="detail-row"><span>위치</span><strong>{selectedEquipment.location}</strong></div>
+            </div>
+
+            <EquipmentHistory equipmentId={selectedEquipment.id} />
+
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="modal-edit-button"
+                onClick={() => {
+                  handleEdit(selectedEquipment);
+                  setSelectedEquipment(null);
+                }}
+              >
+                수정하기
+              </button>
+              <button type="button" className="modal-close-button" onClick={() => setSelectedEquipment(null)}>
+                닫기
+              </button>
             </div>
           </div>
         </div>
