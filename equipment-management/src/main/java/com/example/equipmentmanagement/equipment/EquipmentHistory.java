@@ -28,7 +28,7 @@ public class EquipmentHistory {
     @Column(name = "NEW_STATUS_CODE_ID", nullable = false)
     private Long newStatusCodeId;
 
-    @Column(name = "COMMENT", nullable = false, length = 1000)
+    @Column(name = "CHANGE_COMMENT", nullable = false, length = 1000)
     private String comment;
 
     @Column(name = "CHANGED_BY", nullable = false, length = 100)
