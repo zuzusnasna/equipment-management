@@ -27,7 +27,6 @@ public class EquipmentService {
         this.session = session;
     }
 
-    // 전체 장비 조회
     public List<Equipment> getAllEquipments() {
         return equipmentRepository.findAll();
     }
@@ -36,14 +35,12 @@ public class EquipmentService {
         return equipmentRepository.existsByEqNo(eqNo);
     }
 
-    // 특정 장비 조회
     public Equipment getEquipment(Long id) {
         return equipmentRepository.findById(id)
                 .orElseThrow(() ->
                         new EquipmentNotFoundException("장비를 찾을 수 없습니다."));
     }
 
-    // 장비 등록
     public Equipment createEquipment(EquipmentRequest request) {
         Object companyIdObject = session.getAttribute("COMPANY_ID");
 
@@ -68,11 +65,11 @@ public class EquipmentService {
     }
 
     /**
-     * 장비 정보를 수정합니다.
+     * 장비 수정과 수정 이력을 하나의 트랜잭션으로 처리합니다.
      *
-     * 수정 작업에는 변경 사유를 반드시 전달받고,
-     * 상태가 실제로 변경된 경우에만 EQUIPMENT_HISTORY에 이력을 저장합니다.
-     * 장비 수정과 이력 저장은 하나의 트랜잭션으로 처리됩니다.
+     * 수정 시 입력한 변경 사유를 EQUIPMENT_HISTORY에 저장합니다.
+     * 상태가 변경되지 않았더라도 실제 수정 작업의 추적이 가능하도록
+     * 이전 상태와 현재 상태를 함께 기록합니다.
      */
     @Transactional
     public Equipment updateEquipment(Long id, EquipmentUpdateRequest request) {
@@ -97,6 +94,14 @@ public class EquipmentService {
                 newStatusCodeId
         );
 
+        System.out.println("================================");
+        System.out.println("장비 수정 ID = " + id);
+        System.out.println("이전 상태 코드 = " + previousStatusCodeId);
+        System.out.println("변경 상태 코드 = " + newStatusCodeId);
+        System.out.println("상태 변경 여부 = " + statusChanged);
+        System.out.println("변경 사유 = " + comment);
+        System.out.println("================================");
+
         equipment.setEqNo(request.getEqNo());
         equipment.setName(request.getName());
         equipment.setLocation(request.getLocation());
@@ -105,30 +110,27 @@ public class EquipmentService {
 
         Equipment savedEquipment = equipmentRepository.saveAndFlush(equipment);
 
-        // 상태가 실제로 변경된 경우에만 상태 변경 이력을 추가합니다.
-        if (statusChanged) {
-            String changedBy = getChangedBy();
+        String changedBy = getChangedBy();
 
-            EquipmentHistory history = new EquipmentHistory(
-                    id,
-                    previousStatusCodeId,
-                    newStatusCodeId,
-                    comment,
-                    changedBy,
-                    LocalDateTime.now()
-            );
+        EquipmentHistory history = new EquipmentHistory(
+                id,
+                previousStatusCodeId,
+                newStatusCodeId,
+                comment,
+                changedBy,
+                LocalDateTime.now()
+        );
 
-            // 즉시 INSERT를 실행하여 장비 수정과 이력 저장이 정상적으로 수행되는지 보장합니다.
-            equipmentHistoryRepository.saveAndFlush(history);
-        }
+        System.out.println("히스토리 저장 시도 - 장비 ID = " + id);
+        System.out.println("변경자 = " + changedBy);
+
+        equipmentHistoryRepository.saveAndFlush(history);
+
+        System.out.println("히스토리 저장 완료 - 장비 ID = " + id);
 
         return savedEquipment;
     }
 
-    /**
-     * 현재 로그인한 사용자의 ID를 변경자 정보로 사용합니다.
-     * 로그인 세션에 저장된 값이 없는 경우 추적성을 위해 UNKNOWN으로 기록합니다.
-     */
     private String getChangedBy() {
         Object loginId = session.getAttribute("LOGIN_ID");
         if (loginId == null) {
@@ -137,7 +139,6 @@ public class EquipmentService {
         return loginId != null ? loginId.toString() : "UNKNOWN";
     }
 
-    // 장비 삭제
     public void deleteEquipment(Long id) {
         Equipment equipment = equipmentRepository.findById(id)
                 .orElseThrow(() ->
@@ -146,12 +147,10 @@ public class EquipmentService {
         equipmentRepository.delete(equipment);
     }
 
-    // 상태별 장비 조회
     public List<Equipment> getEquipmentsByStatus(Long statusCodeId) {
         return equipmentRepository.findByStatusCodeId(statusCodeId);
     }
 
-    // 이름 검색
     public List<Equipment> searchByName(String name) {
         return equipmentRepository.findByNameContaining(name);
     }
