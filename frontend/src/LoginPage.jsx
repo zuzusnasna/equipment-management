@@ -59,32 +59,57 @@ function LoginPage({ onLogin }) {
     };
 
     return (
-        <div className="login-container">
-            <form className="login-form" onSubmit={handleSubmit}>
-                <h1>Equipment Management</h1>
+        <div className="login-page">
+            <div className="login-card">
+                <div className="login-header">
+                    <div className="login-icon">⚙️</div>
+                    <h1>장비 관리 시스템</h1>
+                    <p>EQUIPMENT MANAGEMENT SYSTEM</p>
+                </div>
 
-                <input
-                    type="text"
-                    placeholder="아이디"
-                    value={loginId}
-                    onChange={(e) => setLoginId(e.target.value)}
-                    disabled={loading}
-                />
+                <div>
+                    <h2 className="login-title">로그인</h2>
+                    <p className="login-description">
+                        장비 관리 시스템을 이용하려면 로그인해주세요.
+                    </p>
+                </div>
 
-                <input
-                    type="password"
-                    placeholder="비밀번호"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={loading}
-                />
+                <form className="login-form" onSubmit={handleSubmit}>
+                    <div className="login-form-group">
+                        <label htmlFor="loginId">아이디</label>
+                        <input
+                            id="loginId"
+                            type="text"
+                            placeholder="아이디를 입력하세요"
+                            value={loginId}
+                            onChange={(e) => setLoginId(e.target.value)}
+                            disabled={loading}
+                            autoComplete="username"
+                        />
+                    </div>
 
-                {error && <p className="login-error">{error}</p>}
+                    <div className="login-form-group">
+                        <label htmlFor="password">비밀번호</label>
+                        <input
+                            id="password"
+                            type="password"
+                            placeholder="비밀번호를 입력하세요"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            disabled={loading}
+                            autoComplete="current-password"
+                        />
+                    </div>
 
-                <button type="submit" disabled={loading}>
-                    {loading ? "로그인 중..." : "로그인"}
-                </button>
-            </form>
+                    {error && <p className="login-error">{error}</p>}
+
+                    <button type="submit" className="login-button" disabled={loading}>
+                        {loading ? "로그인 중..." : "로그인"}
+                    </button>
+                </form>
+
+                <div className="login-footer">Equipment Management Service</div>
+            </div>
         </div>
     );
 }
