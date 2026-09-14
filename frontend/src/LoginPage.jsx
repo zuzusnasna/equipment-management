@@ -34,11 +34,32 @@ function LoginPage({ onLogin }) {
                 }
             );
 
-            const data = await response.json();
+            // 백엔드 로그인 응답이 JSON인지 확인한 뒤
+            // JSON이면 객체로 변환하고, 문자열이면 그대로 사용합니다.
+            const contentType = response.headers.get("content-type") || "";
+            const responseText = await response.text();
+
+            let data = null;
+
+            if (contentType.includes("application/json")) {
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error("로그인 응답 JSON 파싱 오류:", parseError);
+                    throw new Error("서버 응답 형식이 올바르지 않습니다.");
+                }
+            } else {
+                data = responseText;
+            }
 
             if (!response.ok) {
+                // 백엔드가 "아이디 또는 비밀번호..." 같은 문자열을 반환하더라도
+                // response.json()을 다시 호출하지 않고 해당 메시지를 사용합니다.
                 throw new Error(
-                    "아이디 또는 비밀번호가 올바르지 않습니다."
+                    typeof data === "string" && data.trim()
+                        ? data
+                        : data?.message ||
+                          "아이디 또는 비밀번호가 올바르지 않습니다."
                 );
             }
 
@@ -78,7 +99,6 @@ function LoginPage({ onLogin }) {
 
                 </div>
 
-
                 <form
                     className="login-form"
                     onSubmit={handleSubmit}
@@ -104,7 +124,6 @@ function LoginPage({ onLogin }) {
 
                     </div>
 
-
                     <div className="login-form-group">
 
                         <label htmlFor="password">
@@ -125,13 +144,11 @@ function LoginPage({ onLogin }) {
 
                     </div>
 
-
                     {error && (
                         <div className="login-error">
                             {error}
                         </div>
                     )}
-
 
                     <button
                         type="submit"
@@ -144,7 +161,6 @@ function LoginPage({ onLogin }) {
                     </button>
 
                 </form>
-
 
                 <div className="login-footer">
                     Equipment Management System
