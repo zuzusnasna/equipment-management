@@ -1,0 +1,20 @@
+.equipment-history {
+  margin-top: 24px;
+  overflow-x: auto;
+}
+
+.equipment-history table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.equipment-history th,
+.equipment-history td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.equipment-history th {
+  background: #f5f5f5;
+}
