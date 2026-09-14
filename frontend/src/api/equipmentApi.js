@@ -45,6 +45,34 @@ export async function getEquipment(id) {
 }
 
 // ========================================
+// 장비 상태 변경 이력 조회
+// ========================================
+
+export async function getEquipmentHistory(id) {
+    const response = await fetch(
+        `${API_BASE_URL}/equipments/${id}/history`,
+        {
+            method: "GET",
+            credentials: "include",
+        }
+    );
+
+    const responseText = await response.text();
+
+    if (!response.ok) {
+        throw new Error(
+            `상태 변경 이력 조회 실패: ${response.status} / ${responseText}`
+        );
+    }
+
+    try {
+        return JSON.parse(responseText);
+    } catch {
+        return [];
+    }
+}
+
+// ========================================
 // 장비 번호 중복 확인
 // ========================================
 
