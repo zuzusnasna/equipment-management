@@ -1,7 +1,7 @@
 import { StrictMode, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import App from "./App.jsx";
+import App from "./App.jsx?ui=20260914-2";
 import LoginPage from "./LoginPage.jsx";
 
 export function Root() {
