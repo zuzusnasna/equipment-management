@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class EquipmentService {
@@ -69,9 +70,8 @@ public class EquipmentService {
     /**
      * 장비 정보를 수정합니다.
      *
-     * 수정 작업에는 변경 사유를 반드시 남기도록 하여
-     * 누가 어떤 목적으로 장비 정보를 변경했는지 추적할 수 있도록 합니다.
-     * 상태가 실제로 변경된 경우에는 상태 변경 이력도 함께 저장합니다.
+     * 수정 작업에는 변경 사유를 반드시 전달받고,
+     * 상태가 실제로 변경된 경우에만 EQUIPMENT_HISTORY에 이력을 저장합니다.
      * 장비 수정과 이력 저장은 하나의 트랜잭션으로 처리됩니다.
      */
     @Transactional
@@ -92,7 +92,7 @@ public class EquipmentService {
 
         Long previousStatusCodeId = equipment.getStatusCodeId();
         Long newStatusCodeId = request.getStatusCodeId();
-        boolean statusChanged = !java.util.Objects.equals(
+        boolean statusChanged = !Objects.equals(
                 previousStatusCodeId,
                 newStatusCodeId
         );
@@ -103,7 +103,7 @@ public class EquipmentService {
         equipment.setCategoryId(request.getCategoryId());
         equipment.setStatusCodeId(newStatusCodeId);
 
-        Equipment savedEquipment = equipmentRepository.save(equipment);
+        Equipment savedEquipment = equipmentRepository.saveAndFlush(equipment);
 
         // 상태가 실제로 변경된 경우에만 상태 변경 이력을 추가합니다.
         if (statusChanged) {
@@ -118,7 +118,8 @@ public class EquipmentService {
                     LocalDateTime.now()
             );
 
-            equipmentHistoryRepository.save(history);
+            // 즉시 INSERT를 실행하여 장비 수정과 이력 저장이 정상적으로 수행되는지 보장합니다.
+            equipmentHistoryRepository.saveAndFlush(history);
         }
 
         return savedEquipment;
