@@ -69,8 +69,10 @@ public class EquipmentService {
     /**
      * 장비 정보를 수정합니다.
      *
-     * 상태 코드가 실제로 변경된 경우에는 변경 사유를 반드시 입력받고,
-     * 장비 수정과 상태 변경 이력을 하나의 트랜잭션으로 처리합니다.
+     * 수정 작업에는 변경 사유를 반드시 남기도록 하여
+     * 누가 어떤 목적으로 장비 정보를 변경했는지 추적할 수 있도록 합니다.
+     * 상태가 실제로 변경된 경우에는 상태 변경 이력도 함께 저장합니다.
+     * 장비 수정과 이력 저장은 하나의 트랜잭션으로 처리됩니다.
      */
     @Transactional
     public Equipment updateEquipment(Long id, EquipmentUpdateRequest request) {
@@ -78,19 +80,22 @@ public class EquipmentService {
                 .orElseThrow(() ->
                         new EquipmentNotFoundException("장비를 찾을 수 없습니다."));
 
+        String comment = request.getComment() == null
+                ? ""
+                : request.getComment().trim();
+
+        if (comment.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "장비를 수정하려면 변경 사유를 입력해야 합니다."
+            );
+        }
+
         Long previousStatusCodeId = equipment.getStatusCodeId();
         Long newStatusCodeId = request.getStatusCodeId();
         boolean statusChanged = !java.util.Objects.equals(
                 previousStatusCodeId,
                 newStatusCodeId
         );
-
-        if (statusChanged && (request.getComment() == null
-                || request.getComment().trim().isEmpty())) {
-            throw new IllegalArgumentException(
-                    "장비 상태를 변경하려면 변경 사유를 입력해야 합니다."
-            );
-        }
 
         equipment.setEqNo(request.getEqNo());
         equipment.setName(request.getName());
@@ -100,6 +105,7 @@ public class EquipmentService {
 
         Equipment savedEquipment = equipmentRepository.save(equipment);
 
+        // 상태가 실제로 변경된 경우에만 상태 변경 이력을 추가합니다.
         if (statusChanged) {
             String changedBy = getChangedBy();
 
@@ -107,7 +113,7 @@ public class EquipmentService {
                     id,
                     previousStatusCodeId,
                     newStatusCodeId,
-                    request.getComment().trim(),
+                    comment,
                     changedBy,
                     LocalDateTime.now()
             );
